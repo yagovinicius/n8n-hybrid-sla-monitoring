@@ -1,25 +1,40 @@
-# Hybrid SLA & Compliance Monitoring System | Sistema Híbrido de Monitoramento
+# Olá, sou o Yago | Hi, I'm Yago
 
-## 🇺🇸 English
-### 📝 Description
-A high-performance hybrid automation built with **n8n** to audit operational inconsistencies and SLA breaches. The system unifies overdue service monitoring and fiscal compliance auditing (inactive tax IDs) into a single intelligent ecosystem.
+<table align="center">
+  <tr>
+    <td width="50%" valign="top">
+      <h3>🇧🇷 Português</h3>
+      Arquiteto de Soluções e Analista de Dados no <b>Sebrae GO</b>. Especialista em converter processos complexos em ecossistemas inteligentes com IA e Automação. 
+      <br><br>
+      🎓 <i>IA (GRAN) & Adm (Unialfa)</i>
+    </td>
+    <td width="50%" valign="top">
+      <h3>🇺🇸 English</h3>
+      Solutions Architect and Data Analyst at <b>Sebrae GO</b>. Expert in converting complex processes into intelligent ecosystems using AI and Automation.
+      <br><br>
+      🎓 <i>AI Tech & Business Admin</i>
+    </td>
+  </tr>
+</table>
 
-### ⚙️ Architectural Decisions
-* **Unified Workflow:** Designed as a single stream to ensure easy maintenance and centralized business logic.
-* **Performance:** Processed months of backlog (hundreds of errors) in just **3m 12s** during its initial run.
-* **Data Integrity:** Integrated with **Supabase** to ensure every event generates a structured log for BI analysis.
+<p align="center">
+  <img src="https://img.shields.io/badge/n8n-FF6D5A?style=for-the-badge&logo=n8n&logoColor=white" />
+  <img src="https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54" />
+  <img src="https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white" />
+  <img src="https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white" />
+</p>
 
 ---
 
-## 🇧🇷 Português
-### 📝 Descrição
-Sistema híbrido de alta performance desenvolvido no **n8n** para auditar inconsistências operacionais e quebras de SLA. A solução unifica o monitoramento de atendimentos atrasados e a auditoria de conformidade fiscal (CNPJs baixados) em um único ecossistema inteligente.
-
-### ⚙️ Decisões de Arquitetura
-* **Fluxo Unificado:** Projetado como uma esteira única para facilitar a manutenção e centralizar as regras de negócio.
-* **Performance:** Processou meses de pendências acumuladas em apenas **3min 12s** na primeira execução.
-* **Integridade de Dados:** Integração nativa com **Supabase** para garantir que cada evento gere um log estruturado para futura análise em Dashboards de BI.
+### 📊 Estatísticas | Stats
+<p align="center">
+  <img height="180em" src="https://github-readme-stats.vercel.app/api?username=yagovinicius&show_icons=true&theme=dark" />
+  <img height="180em" src="https://github-readme-stats.vercel.app/api/top-langs/?username=yagovinicius&layout=compact&theme=dark" />
+</p>
 
 ---
-### 🖼️ Preview
-![System Preview](preview.png)
+
+<p align="center">
+  <a href="mailto:yagoviniciusribeiro05@gmail.com"><img src="https://img.shields.io/badge/Email-D14836?style=for-the-badge&logo=gmail&logoColor=white" target="_blank"></a>
+  <a href="https://www.linkedin.com/in/yago-vinícius-ribeiro-da-silva-549319275" target="_blank"><img src="https://img.shields.io/badge/-LinkedIn-%230077B5?style=for-the-badge&logo=linkedin&logoColor=white"></a>
+</p>
