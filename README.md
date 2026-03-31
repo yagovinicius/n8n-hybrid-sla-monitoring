@@ -1,7 +1,7 @@
 # Hybrid SLA & Compliance Monitoring System | Sistema Híbrido de Monitoramento
 
 <div align="center">
-  <video src="https://raw.githubusercontent.com/yagovinicius/n8n-hybrid-sla-monitoring/main/demonstration.mp4" width="100%" controls autoplay loop muted>
+  <video src="https://github.com/yagovinicius/n8n-hybrid-sla-monitoring/blob/main/demonstration.mp4?raw=true" width="100%" controls autoplay loop muted>
   </video>
 </div>
 
