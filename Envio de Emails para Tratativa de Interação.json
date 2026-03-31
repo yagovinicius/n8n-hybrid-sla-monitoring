@@ -1,0 +1,807 @@
+{
+  "name": "Envio de Emails para Tratativa de Interação",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "simple": false,
+        "filters": {
+          "labelIds": [
+            "Label_5824337679860661926"
+          ]
+        },
+        "options": {
+          "downloadAttachments": true
+        }
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -384,
+        -304
+      ],
+      "id": "9a2d035f-ffe7-46f7-8e11-9fff11f1c07d",
+      "name": "Interações em Aberto",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Mqe4lszxgycL3QWi",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "simple": false,
+        "filters": {
+          "labelIds": [
+            "Label_6193411851323407471"
+          ]
+        },
+        "options": {
+          "downloadAttachments": true
+        }
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -384,
+        -496
+      ],
+      "id": "27df1899-dba5-4531-96d4-8df917c1cb49",
+      "name": "CNPJs Baixados",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Mqe4lszxgycL3QWi",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "d_cnpjs_baixados",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "Snapshot",
+              "fieldValue": "={{ $now.format('yyyy/MM/dd') }}"
+            },
+            {
+              "fieldId": "Unidade Organizacional",
+              "fieldValue": "={{ $json['Unidade Organizacional'] }}"
+            },
+            {
+              "fieldId": "CPF do Usuário",
+              "fieldValue": "={{ $json['CPF Atendente'] }}"
+            },
+            {
+              "fieldId": "Nome completo",
+              "fieldValue": "={{ $json.Atendente }}"
+            },
+            {
+              "fieldId": "Email",
+              "fieldValue": "={{ $json.Email }}"
+            },
+            {
+              "fieldId": "Tipo de Usuário",
+              "fieldValue": "={{ $json['Tipo de Usuário'] }}"
+            },
+            {
+              "fieldId": "Interação Foco nº",
+              "fieldValue": "={{ $json['Interação Foco nº'] }}"
+            },
+            {
+              "fieldId": "Data",
+              "fieldValue": "={{ $json['Hora Início'] }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1296,
+        -416
+      ],
+      "id": "eac7f538-a00e-41e2-a762-1a51260ecd73",
+      "name": "Create a row: CNPJ Baixado",
+      "credentials": {
+        "supabaseApi": {
+          "id": "af9OGkIMraYnq7Yb",
+          "name": "Supabase UADR"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "d_interacoes_em_aberto",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "Snapshot",
+              "fieldValue": "={{ $now.format('yyyy/MM/dd') }}"
+            },
+            {
+              "fieldId": "Unidade Organizacional",
+              "fieldValue": "={{ $json['Unidade Organizacional'] }}"
+            },
+            {
+              "fieldId": "CPF do Usuário",
+              "fieldValue": "={{ $json['CPF Atendente'] }}"
+            },
+            {
+              "fieldId": "Nome completo",
+              "fieldValue": "={{ $json['Atendente'] }}"
+            },
+            {
+              "fieldId": "Email",
+              "fieldValue": "={{ $json.Email }}"
+            },
+            {
+              "fieldId": "Tipo de Usuário",
+              "fieldValue": "={{ $json['Tipo de Usuário'] }}"
+            },
+            {
+              "fieldId": "Interação Foco nº",
+              "fieldValue": "={{ $json['Interação Foco nº'] }}"
+            },
+            {
+              "fieldId": "Data",
+              "fieldValue": "={{ $json['Data/Hora de abertura'] ? $json['Data/Hora de abertura'].toDateTime('dd/MM/yyyy HH:mm').format('dd/MM/yyyy') : $json['Hora Início'] }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1296,
+        16
+      ],
+      "id": "0d8cf3d1-d890-4449-b449-2d13a3fb97bd",
+      "name": "Create a row: Interações em Aberto",
+      "credentials": {
+        "supabaseApi": {
+          "id": "af9OGkIMraYnq7Yb",
+          "name": "Supabase UADR"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Summarize Individual').item.json.Email }}",
+        "subject": "={{ $json.assunto }}",
+        "message": "=<div style=\"font-family: Arial, sans-serif; color: #333333; max-width: 600px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden;\">\n    \n    <div style=\"background-color: #005ce5; color: #ffffff; padding: 20px; text-align: center;\">\n        <h2 style=\"margin: 0;\">{{ $('CNPJs Baixados').isExecuted ? ( $('Summarize Individual').item.json['appended_Interação_Foco_nº'].length > 1 ? \"Ação Necessária — Atendimentos Vinculados a CNPJs Baixados na Receita Federal\" : \"Ação Necessária — Atendimento Vinculado a CNPJ Baixado na Receita Federal\" ) : ( $('Summarize Individual').item.json['appended_Interação_Foco_nº'].length > 1 ? \"FOCO – Interações pendentes para conclusão\" : \"FOCO – Interação pendente para conclusão\" ) }}</h2>\n    </div>\n    \n    <div style=\"padding: 20px;\">\n        \n        <p style=\"font-size: 16px;\">Olá, <strong>{{ $('Summarize Individual').item.json.Atendente.split(' ')[0].toLowerCase().replace(/^./, c => c.toUpperCase()) }}</strong>,</p>\n        \n        <p style=\"line-height: 1.5;\">{{ $('CNPJs Baixados').isExecuted ? ( $('Summarize Individual').item.json['appended_Interação_Foco_nº'].length > 1 ? \"Foram identificadas interações registradas vinculadas a CNPJs que constam como baixados na Receita Federal.\" : \"Foi identificada uma interação registrada vinculada a um CNPJ que consta como baixado na Receita Federal.\" ) : ( $('Summarize Individual').item.json['appended_Interação_Foco_nº'].length > 1 ? \"Identificamos que há interações registradas por você que ainda constam com o status Em andamento.\" : \"Identificamos que há uma interação registrada por você que ainda consta com o status Em andamento.\" ) }}</p>\n\n        {{ $('CNPJs Baixados').isExecuted ? `\n        <div style=\"margin-top: 15px; margin-bottom: 15px;\">\n            <p style=\"line-height: 1.5; margin-bottom: 5px;\"><strong>Orientações para regularização:</strong></p>\n            <ul style=\"line-height: 1.5; margin-top: 0;\">\n                <li>Verificar se o atendimento foi realmente realizado na data registrada no sistema, ou seja, após a baixa do CNPJ.</li>\n                <li><strong>Caso a data esteja incorreta:</strong> Deverá corrigir a data do atendimento no sistema.</li>\n                <li><strong>Caso a data esteja correta:</strong> Verificar se o CNPJ registrado na interação corresponde de fato ao CNPJ atendido.</li>\n                <li><strong>Permanência no FOCO:</strong> Caso os dados estejam corretos mas o CNPJ esteja baixado, o registro deverá ser editado para permanecer vinculado <strong>apenas à Pessoa Física</strong>, removendo a associação com o CNPJ.</li>\n            </ul>\n        </div>\n        ` : `\n        <p style=\"line-height: 1.5;\">Lembramos que interações com o status <strong>\"Em andamento\" não são contabilizadas</strong> para as metas do Sebrae. Pedimos, por gentileza, que verifique se ${ $('Summarize Individual').item.json['appended_Interação_Foco_nº'].length > 1 ? \"os casos requerem conclusão ou exclusão\" : \"o caso requer conclusão ou exclusão\" }.</p>\n        ` }}\n        \n        <div style=\"background-color: #f9f9f9; border-left: 4px solid #ff9900; padding: 15px; margin: 20px 0;\">\n            <p style=\"color: #246EB9; margin-top: 0;\"><strong>{{ $('Summarize Individual').item.json['appended_Interação_Foco_nº'].length > 1 ? \"Interações identificadas:\" : \"Interação identificada:\" }}</strong></p>\n\n            <ul style=\"margin: 0; padding-left: 20px; line-height: 1.8;\">\n                {{ $('Summarize Individual').item.json['appended_Interação_Foco_nº'].map(protocolo => `<li style=\"margin-bottom: 10px;\"><strong>Interação Foco nº:</strong> ${protocolo}</li>`).join('') }}\n            </ul>\n        </div>\n        \n        <p style=\"line-height: 1.5; margin-top: 20px;\">Por favor, acesse o sistema Foco para realizar as correções necessárias.</p>\n        \n        <p style=\"margin-top: 30px; font-size: 14px; color: #777;\">\n            Atenciosamente,<br>\n            {{ $('CNPJs Baixados').isExecuted ? `\n            <strong>Núcleo de Atendimento e Desenvolvimento Regional</strong><br>\n            Sebrae Goiás\n            ` : `\n            <strong>Coordenação Rede Estendida</strong><br>\n            <strong>Suporte Foco (Whatsapp):</strong> (62) 3250-2424\n            ` }}\n        </p>\n        \n    </div>\n</div>",
+        "options": {
+          "ccList": "redeestendida@sebraego.com.br"
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        2176,
+        -128
+      ],
+      "id": "13b3e63c-67ae-4798-b465-f4e18048f377",
+      "name": "Envio de Email: Colaboradores",
+      "webhookId": "e419ffc4-ebc5-4dea-a3f5-ab1a7971b456",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Mqe4lszxgycL3QWi",
+          "name": "Gmail account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "sendTo": "mariana.mendes@sebraego.com.br",
+        "subject": "Ação Necessária — Atendimentos Vinculados a CNPJs Baixados na Receita Federal",
+        "message": "={{ $json.corpo_email }}",
+        "options": {
+          "attachmentsUi": {
+            "attachmentsBinary": [
+              {
+                "property": "planilha"
+              }
+            ]
+          },
+          "ccList": "daniela.rocha@sebraego.com.br, redeestendida@sebraego.com.br"
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1856,
+        -368
+      ],
+      "id": "c0c073d5-4a47-43d6-8602-efba693f2294",
+      "name": "Envio de Email: Interno",
+      "webhookId": "8468ebeb-40c4-4ec4-bc1f-bcdce5946734",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Mqe4lszxgycL3QWi",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "5eb20832-3c6f-40c2-b594-acf12f3cab2c",
+              "leftValue": "={{ $('CNPJs Baixados').isExecuted }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1008,
+        -144
+      ],
+      "id": "415f9386-d191-4fd7-8999-816cfa9ccae9",
+      "name": "Label Origem -> Destino"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "b21f4d09-d576-4192-a694-88ec44f7e0be",
+              "leftValue": "={{ $('CNPJs Baixados').isExecuted }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        80,
+        -432
+      ],
+      "id": "aad99ddf-cb11-4df3-91c9-992e6869e4d1",
+      "name": "Label Origem -> Tratativa"
+    },
+    {
+      "parameters": {
+        "fieldsToSummarize": {
+          "values": [
+            {
+              "aggregation": "append",
+              "field": "Interação Foco nº"
+            }
+          ]
+        },
+        "fieldsToSplitBy": "Email, Atendente, Tipo de Usuário",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.summarize",
+      "typeVersion": 1.1,
+      "position": [
+        1568,
+        -128
+      ],
+      "id": "cb1e2d52-c3ea-4a8a-a8ac-9cccaa1292d4",
+      "name": "Summarize Individual"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "041e02e5-c521-452b-86fa-343a4163d768",
+              "name": "is_plural",
+              "value": "={{ $json['appended_Interação_Foco_nº'].length > 1 }}",
+              "type": "boolean"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1776,
+        -128
+      ],
+      "id": "21ccbded-2b4a-427a-a338-416658302780",
+      "name": "Plural / Singular"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1fce3f5e-c94e-43ec-acb2-250cbacc7d0c",
+              "name": "assunto",
+              "value": "={{ $('CNPJs Baixados').isExecuted ? ($json.is_plural ? \"Ação Necessária — Atendimentos Vinculados a CNPJs Baixados na Receita Federal\" : \"Ação Necessária — Atendimento Vinculado a CNPJ Baixado na Receita Federal\") : ($json.is_plural ? \"FOCO – Interações pendentes para conclusão\" : \"FOCO – Interação pendente para conclusão\") }}",
+              "type": "string"
+            },
+            {
+              "id": "fc8c872c-e58a-4174-b8dc-7de72c180267",
+              "name": "texto",
+              "value": "={{ $('CNPJs Baixados').isExecuted ? ($json.is_plural ? \"Foram identificadas interações registradas vinculadas a CNPJs que constam como baixados na Receita Federal.\" : \"Foi identificada uma interação registrada vinculada a um CNPJ que consta como baixado na Receita Federal.\") : ($json.is_plural ? \"Identificamos que há interações registradas por você que ainda constam com o status Em andamento.\" : \"Identificamos que há uma interação registrada por você que ainda consta com o status Em andamento.\") }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1984,
+        -128
+      ],
+      "id": "be0cdfa5-f44d-41fb-88bb-26a838135c77",
+      "name": "Mensagem"
+    },
+    {
+      "parameters": {
+        "binaryPropertyName": "={{ Object.keys($binary).find(item => $binary[item].fileName.endsWith('csv')) }}",
+        "options": {
+          "delimiter": ";"
+        }
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        -160,
+        -432
+      ],
+      "id": "b9e30d25-8502-46d7-8546-77110111f1f1",
+      "name": "Extrair CSV de Anexo Binário"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "35848077-8b8d-4906-b0ed-de140b927ade",
+              "leftValue": "={{ $json['Data/Hora de abertura'].toDateTime('dd/MM/yyyy HH:mm') }}",
+              "rightValue": "={{ $today }}",
+              "operator": {
+                "type": "dateTime",
+                "operation": "before"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        80,
+        -192
+      ],
+      "id": "319da1f8-c809-4fa9-9a2f-5fc29144e0a9",
+      "name": "Filtro -1d"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "usuarios_unicos",
+        "returnAll": true,
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "CPF do Usuário",
+              "condition": "eq",
+              "keyValue": "={{ $json['CPF Atendente'] }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        368,
+        -48
+      ],
+      "id": "aa589e84-489b-458c-9e30-f303dac153b6",
+      "name": "Encontrar Usuários",
+      "credentials": {
+        "supabaseApi": {
+          "id": "af9OGkIMraYnq7Yb",
+          "name": "Supabase UADR"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "compare": "selectedFields",
+        "fieldsToCompare": "['CPF do Usuário']",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.removeDuplicates",
+      "typeVersion": 2,
+      "position": [
+        576,
+        -48
+      ],
+      "id": "24e1774c-2dc9-42e2-8d2b-4ee893fd89c7",
+      "name": "Remover Duplicatas"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "advanced": true,
+        "mergeByFields": {
+          "values": [
+            {
+              "field1": "CPF Atendente",
+              "field2": "CPF do Usuário"
+            }
+          ]
+        },
+        "joinMode": "enrichInput1",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        800,
+        -144
+      ],
+      "id": "3a870c8c-5a86-45d0-bec1-59f753020717",
+      "name": "Mesclar Bases"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "c1223099-99f7-4561-a2b6-53c754f141ac",
+              "leftValue": "={{ $json.Atendente.trim() }}",
+              "rightValue": "Importador SAS",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "88142586-9ebe-4344-91f4-04abaf6e9195",
+              "leftValue": "={{ $json['Tipo de Usuário'].trim() }}",
+              "rightValue": "=Credenciado",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "ac7b42ad-aa1c-4549-a825-f89025843d15",
+              "leftValue": "={{ $json['Tipo de Usuário'] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1296,
+        -224
+      ],
+      "id": "ef406c7e-8925-4582-aec0-a6a5c2833099",
+      "name": "Tipo de Usuário"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst agrupado = {};\n\n// 1. Agrupando e limpando espaços invisíveis (Garante que o agrupamento não falhe)\nfor (const item of items) {\n  const tipo = (item.json['Tipo de Usuário'] || 'Sem Tipo Definido').trim();\n  if (!agrupado[tipo]) {\n    agrupado[tipo] = [];\n  }\n  agrupado[tipo].push(item.json);\n}\n\n// 2. Construindo o HTML do E-mail (Sem tags interativas bloqueadas pelo Gmail)\nlet html = `\n<div style=\"font-family: Arial, sans-serif; color: #333333; max-width: 800px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden;\">\n  <div style=\"background-color: #005ce5; color: #ffffff; padding: 20px; text-align: center;\">\n      <h2 style=\"margin: 0;\">Ação Necessária — Atendimentos Vinculados a CNPJs Baixados na Receita Federal</h2>\n  </div>\n  \n  <div style=\"padding: 20px;\">\n    <p style=\"font-size: 16px;\">Prezado(a),</p>\n    \n    <p style=\"line-height: 1.5;\">Foram identificadas interações registradas vinculadas a CNPJs que constam como <strong>baixados na Receita Federal</strong>. Solicitamos a regularização conforme as instruções abaixo. O detalhamento completo encontra-se <strong>anexado nesta mensagem</strong>.</p>\n\n    <div style=\"margin-top: 15px; margin-bottom: 25px; background-color: #f4f4f4; padding: 15px; border-left: 5px solid #005eb8;\">\n        <p style=\"line-height: 1.5; margin-top: 0; margin-bottom: 5px;\"><strong>Orientações para regularização:</strong></p>\n        <ul style=\"line-height: 1.5; margin-top: 0; margin-bottom: 0; padding-left: 20px;\">\n            <li style=\"margin-bottom: 5px;\">Verificar se o atendimento foi realmente realizado na data registrada no sistema, ou seja, após a baixa do CNPJ.</li>\n            <li style=\"margin-bottom: 5px;\"><strong>Caso a data esteja incorreta:</strong> Deverá corrigir a data do atendimento no sistema.</li>\n            <li style=\"margin-bottom: 5px;\"><strong>Caso a data esteja correta:</strong> Verificar se o CNPJ registrado na interação corresponde de fato ao CNPJ atendido.</li>\n            <li style=\"margin-bottom: 5px;\"><strong>Permanência no FOCO:</strong> Caso os dados estejam corretos mas o CNPJ esteja baixado, o registro deverá ser editado para permanecer vinculado <strong>apenas à Pessoa Física</strong>, removendo a associação com o CNPJ.</li>\n        </ul>\n    </div>\n`;\n\n// 3. Montando as tabelas agrupadas visualmente (Já que o Dropdown é bloqueado)\nfor (const tipo in agrupado) {\n  html += `\n    <div style=\"margin-bottom: 20px; border: 1px solid #ccc; border-radius: 5px; overflow: hidden;\">\n      <div style=\"background-color: #e0e0e0; padding: 12px; font-weight: bold; color: #005ce5; font-size: 15px; border-bottom: 1px solid #ccc;\">\n        📂 ${tipo} (${agrupado[tipo].length} registros)\n      </div>\n      <div style=\"overflow-x: auto; background-color: #fff;\">\n        <table style=\"width: 100%; border-collapse: collapse; font-size: 13px;\">\n          <thead>\n            <tr style=\"background-color: #f4f4f4; color: #333;\">\n              <th style=\"padding: 8px; border-bottom: 1px solid #ccc; text-align: left;\">Atendente</th>\n              <th style=\"padding: 8px; border-bottom: 1px solid #ccc; text-align: left;\">Interação</th>\n              <th style=\"padding: 8px; border-bottom: 1px solid #ccc; text-align: left;\">CNPJ</th>\n              <th style=\"padding: 8px; border-bottom: 1px solid #ccc; text-align: left;\">Unidade</th>\n            </tr>\n          </thead>\n          <tbody>\n  `;\n  for (const row of agrupado[tipo]) {\n    html += `\n            <tr>\n              <td style=\"padding: 8px; border-bottom: 1px solid #eee;\">${row['Atendente'] || '-'}</td>\n              <td style=\"padding: 8px; border-bottom: 1px solid #eee;\">${row['Interação Foco nº'] || '-'}</td>\n              <td style=\"padding: 8px; border-bottom: 1px solid #eee;\">${row['CNPJ'] || '-'}</td>\n              <td style=\"padding: 8px; border-bottom: 1px solid #eee;\">${row['Unidade Organizacional'] || '-'}</td>\n            </tr>\n    `;\n  }\n  html += `\n          </tbody>\n        </table>\n      </div>\n    </div>\n  `;\n}\n\nhtml += `\n    <p style=\"margin-top: 30px; font-size: 14px; color: #777;\">\n        Atenciosamente,<br>\n        <strong>Núcleo de Atendimento e Desenvolvimento Regional</strong><br>\n        Sebrae Goiás\n    </p>\n  </div>\n</div>\n`;\n\n// 4. Arquivo Excel\nlet csvContent = '\\uFEFFAtendente;CPF Atendente;Interação Foco nº;CNPJ;Situação Cadastral RFB;Unidade Organizacional;Tipo de Usuário\\n';\n\nfor (const item of items) {\n  const j = item.json;\n  csvContent += `${j['Atendente'] || ''};${j['CPF Atendente'] || ''};${j['Interação Foco nº'] || ''};${j['CNPJ'] || ''};${j['Situação Cadastral RFB'] || ''};${j['Unidade Organizacional'] || ''};${j['Tipo de Usuário'] || ''}\\n`;\n}\n\nconst buffer = Buffer.from(csvContent, 'utf8');\n\nreturn [{\n  json: { \n    corpo_email: html \n  },\n  binary: {\n    planilha: {\n      data: buffer.toString('base64'),\n      mimeType: 'text/csv',\n      fileName: 'Relatorio_CNPJs_Baixados.csv'\n    }\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1632,
+        -368
+      ],
+      "id": "13eeb9be-e7b3-4719-a017-e0964958d77f",
+      "name": "Code in JavaScript"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Interações em Aberto": {
+      "main": [
+        [
+          {
+            "node": "Extrair CSV de Anexo Binário",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CNPJs Baixados": {
+      "main": [
+        [
+          {
+            "node": "Extrair CSV de Anexo Binário",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Envio de Email: Colaboradores": {
+      "main": [
+        []
+      ]
+    },
+    "Label Origem -> Destino": {
+      "main": [
+        [
+          {
+            "node": "Tipo de Usuário",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Create a row: CNPJ Baixado",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Summarize Individual",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Create a row: Interações em Aberto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Label Origem -> Tratativa": {
+      "main": [
+        [
+          {
+            "node": "Encontrar Usuários",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Mesclar Bases",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Filtro -1d",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Summarize Individual": {
+      "main": [
+        [
+          {
+            "node": "Plural / Singular",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Plural / Singular": {
+      "main": [
+        [
+          {
+            "node": "Mensagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mensagem": {
+      "main": [
+        [
+          {
+            "node": "Envio de Email: Colaboradores",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extrair CSV de Anexo Binário": {
+      "main": [
+        [
+          {
+            "node": "Label Origem -> Tratativa",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filtro -1d": {
+      "main": [
+        [
+          {
+            "node": "Encontrar Usuários",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Mesclar Bases",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Encontrar Usuários": {
+      "main": [
+        [
+          {
+            "node": "Remover Duplicatas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remover Duplicatas": {
+      "main": [
+        [
+          {
+            "node": "Mesclar Bases",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Mesclar Bases": {
+      "main": [
+        [
+          {
+            "node": "Label Origem -> Destino",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tipo de Usuário": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Summarize Individual",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Envio de Email: Interno",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "492c959c-8936-4d0a-b5b8-242a1775dc80",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "6a946dd6302c3c4565d67a914f02cd92eb67b758fef9b1b5a4b74a1d1e44db6c"
+  },
+  "id": "bMbFu-txeCXiiIacZED9X",
+  "tags": [
+    {
+      "updatedAt": "2026-03-24T13:02:52.880Z",
+      "createdAt": "2026-03-24T13:02:52.880Z",
+      "id": "7DKRn6piiJSL15lw",
+      "name": "Rede Estendida"
+    },
+    {
+      "updatedAt": "2026-03-24T13:03:04.678Z",
+      "createdAt": "2026-03-24T13:03:04.678Z",
+      "id": "90GeUjZR76OOlgNO",
+      "name": "FOCO"
+    },
+    {
+      "updatedAt": "2026-03-24T13:02:57.504Z",
+      "createdAt": "2026-03-24T13:02:57.504Z",
+      "id": "GOvyGwsYzsU23Ujk",
+      "name": "Monitoramento"
+    },
+    {
+      "updatedAt": "2026-02-12T17:14:15.732Z",
+      "createdAt": "2026-02-12T17:14:15.732Z",
+      "id": "vsNdkF9jzH1AcqZq",
+      "name": "SEBRAE"
+    }
+  ]
+}
